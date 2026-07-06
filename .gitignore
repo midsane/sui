@@ -1,0 +1,6 @@
+.venv
+.mypy_cache
+uv.lock
+__pycache__/
+*.py[cod]
+*$py.class
