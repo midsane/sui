@@ -1,8 +1,9 @@
 {
   "mypy-type-checker.importStrategy": "fromEnvironment",
   "[python]": {
-  "editor.codeActionsOnSave": {
-    "source.fixAll.ruff": "explicit"
-  }
-}
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit"
+    }
+  },
+  "ruff.importStrategy": "fromEnvironment"
 }
