@@ -4,3 +4,5 @@ uv.lock
 __pycache__/
 *.py[cod]
 *$py.class
+
+**/migrations/versions/__pycache__/
