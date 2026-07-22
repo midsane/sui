@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     app_name: str = "Sui"
     debug: bool = False
 
-    # database_url: str
+    database_url: str = ""
     # openai_api_key: str
 
     model_config = SettingsConfigDict(

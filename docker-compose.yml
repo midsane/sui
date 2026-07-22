@@ -14,18 +14,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data 
 
-  api:
-    build: .
-    container_name: sui_agent_runtime
-    command: uv run uvicorn app.main:app --reload
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://myuser:mypassword@db:5432/mydatabase
-    depends_on:
-      - db
+  # api:
+  #   build: .
+  #   container_name: sui_agent_runtime
+  #   command: uv run uvicorn app.main:app --reload
+  #   volumes:
+  #     - .:/app
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - DATABASE_URL=postgresql://myuser:mypassword@db:5432/mydatabase
+  #   depends_on:
+  #     - db
 
 volumes:
   postgres_data:
