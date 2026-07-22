@@ -2,6 +2,16 @@
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# DatabaseSettings
+
+# LLMSettings
+
+# RedisSettings
+
+# DockerSettings
+
+# LoggingSettings
+
 
 class Settings(BaseSettings):
     app_name: str = "Sui"

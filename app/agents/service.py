@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import HTTPException
+from app.core.exception import AgentAlreadyExists, AgentNotFound
 
 from ..schemas.agent import AgentCreate, AgentUpdate
 from .models import Agent
@@ -15,9 +15,7 @@ class AgentService:
         existing = self.repository.get_by_name(data.name)
 
         if existing:
-            raise HTTPException(
-                status_code=409, detail="Agent with this name already exists"
-            )
+            raise AgentAlreadyExists()
 
         agent = Agent(
             name=data.name,
@@ -35,7 +33,7 @@ class AgentService:
         agent = self.repository.get(agent_id)
 
         if agent is None:
-            raise HTTPException(status_code=404, detail="Agent not found")
+            raise AgentNotFound()
 
         retrived_agent: Agent = agent
         return retrived_agent
