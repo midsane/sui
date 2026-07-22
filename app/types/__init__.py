@@ -1,7 +1,3 @@
-from enum import Enum
+from .agents import AgentStatus
 
-
-class AgentStatus(Enum):
-    ACTIVE = "active"
-    DISABLED = "disabled"
-    ARCHIVED = "archived"
+__all__ = ["AgentStatus"]

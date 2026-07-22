@@ -4,8 +4,8 @@ from uuid import UUID, uuid4
 from sqlalchemy import Enum, ForeignKey, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ..db import Base
-from ..types import AgentStatus
+from ...db import Base
+from ...types import AgentStatus
 
 
 class Agent(Base):

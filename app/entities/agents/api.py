@@ -1,16 +1,15 @@
-"""Define API routes."""
-
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from schemas import AgentCreate, AgentResponse, AgentUpdate
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.agents.models import Agent
-from app.agents.repository import AgentRepository
-from app.agents.service import AgentService
 from app.db import get_db
-from app.schemas.agent import AgentCreate, AgentResponse, AgentUpdate
+
+from .models import Agent
+from .repository import AgentRepository
+from .service import AgentService
 
 router = APIRouter()
 

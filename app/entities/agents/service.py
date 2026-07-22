@@ -1,10 +1,9 @@
 from uuid import UUID
 
-from app.core.exception import AgentAlreadyExists, AgentNotFound
-
-from ..schemas.agent import AgentCreate, AgentUpdate
+from .exceptions import AgentAlreadyExists, AgentNotFound
 from .models import Agent
 from .repository import AgentRepository
+from .schemas import AgentCreate, AgentUpdate
 
 
 class AgentService:
