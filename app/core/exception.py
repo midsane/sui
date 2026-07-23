@@ -1,24 +1,21 @@
-from fastapi import Request, status
-from fastapi.responses import JSONResponse
+from typing import cast
 
-from app.entities.agents import agent_exception
+from fastapi import Request
+from fastapi.responses import JSONResponse
 
 
 class SuiError(Exception):
-    """Base class for domain errors raised by the application."""
+    status_code = 500
+    detail = "Internal Server Error"
 
 
-async def handle_sui_error(request: Request, exc: Exception) -> JSONResponse:
-    if isinstance(exc, agent_exception.AgentAlreadyExists):
-        return JSONResponse(
-            status_code=status.HTTP_409_CONFLICT,
-            content={"detail": "Agent with this name already exists"},
-        )
+async def handle_sui_error(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
+    error = cast(SuiError, exc)
 
-    if isinstance(exc, agent_exception.AgentNotFound):
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"detail": "Agent not found"},
-        )
-
-    raise exc
+    return JSONResponse(
+        status_code=error.status_code,
+        content={"detail": error.detail},
+    )

@@ -2,8 +2,12 @@ from app.core.exception import SuiError
 
 
 class AgentAlreadyExists(SuiError):
-    """Raised when an agent with the requested name already exists."""
+    status_code = 409
+
+    detail = "Agent already exists"
 
 
 class AgentNotFound(SuiError):
-    """Raised when an agent cannot be found."""
+    status_code = 404
+
+    detail = "Agent not found"

@@ -194,3 +194,25 @@ Phase 8
 Reflection
 
 Now the system can improve itself.
+
+
+[ User Input ]
+      │
+      ▼
+┌─────────────────────────┐
+│ Orchestrator Router     │ ──(Simple Q&A)──► [ Simple LLM Stream ]
+└─────────────────────────┘
+      │ (Task detected)
+      ▼
+┌─────────────────────────┐
+│ Planner Agent           │ ◄──► [ Memory / Chat History ]
+│ (Defines Scope & Stack) │
+└─────────────────────────┘
+      │ (User Confirms Plan)
+      ▼
+┌─────────────────────────┐
+│ Execution Agent (Loop)  │
+│ - ReAct Loop            │
+│ - Call MCP Tools        │ ──► [ Sandbox / Terminal ]
+│ - Track Logs & Tokens   │
+└─────────────────────────┘
