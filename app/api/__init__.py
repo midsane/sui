@@ -2,10 +2,11 @@ from fastapi import APIRouter, Depends, FastAPI
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+# from app.chat.api import router as chat_router
 from app.core.exception import SuiError, handle_sui_error
 from app.db import get_db
-from app.entities.agents import router as agents_router
-from app.entities.execution import router as execution_router
+from app.entities.agents.api import router as agents_router
+from app.entities.execution.api import router as execution_router
 
 base_router = APIRouter()
 db_dependency = Depends(get_db)
@@ -32,5 +33,6 @@ app = FastAPI(title="Sui", version="1.0.0")
 
 
 app.add_exception_handler(SuiError, handle_sui_error)
+# app.include_router(chat_router)
 app.include_router(agents_router)
 app.include_router(execution_router)

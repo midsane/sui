@@ -3,7 +3,6 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
-from schemas import ExecutionCreate
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +10,7 @@ from app.types import ExecutionStatus
 
 from .exceptions import ExecutionNotFound
 from .models import Execution
+from .schemas import ExecutionCreate
 
 
 class ExecutionRepository:

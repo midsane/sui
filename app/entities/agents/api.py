@@ -1,13 +1,13 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
-from schemas import AgentCreate, AgentResponse, AgentUpdate
 from sqlalchemy.orm import Session
 
 from app.db import get_db
 
 from .models import Agent
 from .repository import AgentRepository
+from .schemas import AgentCreate, AgentResponse, AgentUpdate
 from .service import AgentService
 
 router = APIRouter(prefix="/agents", tags=["Agents"])
