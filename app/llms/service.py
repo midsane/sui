@@ -1,3 +1,5 @@
+from collections.abc import AsyncIterator
+
 from app.config.service import ConfigService
 from app.entities.messages.models import Message
 from app.llms.providers.base import BaseProvider
@@ -40,6 +42,12 @@ class LLMService:
         history: list[Message],
     ) -> str:
         return await self._provider().chat(history)
+
+    def stream_chat(
+        self,
+        history: list[Message],
+    ) -> AsyncIterator[str]:
+        return self._provider().stream_chat(history)
 
     async def generate_title(
         self,

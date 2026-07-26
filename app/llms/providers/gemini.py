@@ -1,3 +1,4 @@
+from collections.abc import AsyncIterator
 from typing import Any
 
 from google import genai
@@ -13,10 +14,7 @@ class GeminiProvider(BaseProvider):
         api_key: str,
         model: str,
     ) -> None:
-        self.client = genai.Client(
-            api_key=api_key,
-        )
-
+        self.client = genai.Client(api_key=api_key)
         self.model = model
 
     def _build_contents(
@@ -51,6 +49,21 @@ class GeminiProvider(BaseProvider):
         )
 
         return response.text or ""
+
+    async def stream_chat(
+        self,
+        history: list[Message],
+    ) -> AsyncIterator[str]:
+        stream: Any = await self.client.aio.models.generate_content_stream(
+            model=self.model,
+            contents=self._build_contents(history),
+        )
+
+        async for chunk in stream:
+            text = chunk.text or ""
+
+            if text:
+                yield text
 
     async def generate_title(
         self,

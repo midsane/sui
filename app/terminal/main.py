@@ -1,5 +1,9 @@
 import asyncio
+import time
 
+from rich.console import Console
+
+# from rich.markdown import Markdown
 from app.config.service import ConfigService
 from app.db import AsyncSessionLocal
 from app.entities.conversations import ConversationRepository, ConversationService
@@ -8,6 +12,8 @@ from app.llms.service import LLMService
 from app.runtime.service import RuntimeService
 
 from .commands import CommandHandler
+
+console = Console()
 
 
 async def main() -> None:
@@ -36,9 +42,30 @@ async def main() -> None:
 
                 continue
 
-            response = await runtime.chat(prompt)
+            # response = await runtime.chat(prompt)
 
-            print(response.reply)
+            # console.print(Markdown(response.reply))
+
+            start = time.perf_counter()
+
+            status = console.status("[cyan]◉ Thinking...[/cyan]", spinner="dots")
+            status.start()
+
+            first_chunk = True
+            async for chunk in runtime.stream_chat(prompt):
+                if first_chunk:
+                    status.stop()
+                    console.print("[bold green]✦[/bold green] ", end="")
+                    first_chunk = False
+
+                print(chunk, end="", flush=True)
+
+            elapsed = time.perf_counter() - start
+
+            console.print(f"\n[dim]⏱ {elapsed:.2f}s[/dim]")
+
+
+print()
 
 
 if __name__ == "__main__":
