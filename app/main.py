@@ -1,4 +1,4 @@
-"""Application entry point."""
+from app.terminal.main import main
 
-from app.api import app as app
-from app.core import settings as settings
+if __name__ == "__main__":
+    main()

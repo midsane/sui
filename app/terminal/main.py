@@ -15,7 +15,7 @@ from .commands import CommandHandler
 console = Console()
 
 
-async def main() -> None:
+async def run() -> None:
     config_service = ConfigService()
 
     command_handler = CommandHandler(config_service)
@@ -60,8 +60,5 @@ async def main() -> None:
             console.print(f"\n[dim]⏱ {elapsed:.2f}s[/dim]")
 
 
-print()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+def main() -> None:
+    asyncio.run(run())
