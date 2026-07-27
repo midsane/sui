@@ -1,11 +1,16 @@
-from app.entities.conversations import ConversationService, conversation_schemas  # noqa: I001
-from app.entities.messages import messages_schemas
-from app.entities.messages import MessageService
-from app.types import MessageRole
-from uuid import UUID
-from .schemas import ChatResponse
-from app.llms.service import LLMService
 from collections.abc import AsyncIterator
+from uuid import UUID
+
+from app.entities.conversations import (
+    Conversation,
+    ConversationService,
+    conversation_schemas,
+)
+from app.entities.messages import Message, MessageService, messages_schemas
+from app.llms.service import LLMService
+from app.types import MessageRole
+
+from .schemas import ChatResponse
 
 
 class RuntimeService:
@@ -19,6 +24,19 @@ class RuntimeService:
         self.message_service = message_service
         self.llm_service = llm_service
         self.active_conversation_id: UUID | None = None
+
+    async def list_conversations(self) -> list[Conversation]:
+        return await self.conversation_service.list_conversations()
+
+    async def get_conversations_messages(
+        self, selected_conversation_id: UUID
+    ) -> list[Message]:
+        return await self.message_service.list_conversation_messages(
+            selected_conversation_id
+        )
+
+    async def set_active_conversation(self, conversation_id: UUID) -> None:
+        self.active_conversation_id = conversation_id
 
     async def chat(self, prompt: str) -> ChatResponse:
 

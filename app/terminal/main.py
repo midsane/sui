@@ -18,8 +18,6 @@ console = Console()
 async def run() -> None:
     config_service = ConfigService()
 
-    command_handler = CommandHandler(config_service)
-
     async with AsyncSessionLocal() as db:
         conversation_service = ConversationService(ConversationRepository(db))
 
@@ -33,12 +31,14 @@ async def run() -> None:
             llm_service,
         )
 
+        command_handler = CommandHandler(config_service, runtime_service=runtime)
+
         while True:
             console.print("[bold cyan]⚡ Sui[/bold cyan] [dim]v0.1.0[/dim]")
             prompt = console.input("[bold green]>[/bold green] ")
 
             if prompt.startswith("/"):
-                command_handler.handle(prompt)
+                await command_handler.handle(prompt)
                 continue
 
             start = time.perf_counter()
