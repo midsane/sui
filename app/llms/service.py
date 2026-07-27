@@ -5,6 +5,7 @@ from app.entities.messages.models import Message
 from app.llms.providers.base import BaseProvider
 
 from .providers.factory import ProviderFactory
+from .schemas import ChatResult
 
 
 class LLMService:
@@ -40,7 +41,7 @@ class LLMService:
     async def chat(
         self,
         history: list[Message],
-    ) -> str:
+    ) -> ChatResult:
         return await self._provider().chat(history)
 
     def stream_chat(

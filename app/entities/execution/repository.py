@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.types import ExecutionStatus
+from app.utils.dto import dto_to_dict
 
 from .exceptions import ExecutionNotFound
 from .models import Execution
@@ -18,7 +19,7 @@ class ExecutionRepository:
         self.db = db
 
     async def create(self, execution: ExecutionCreate) -> Execution:
-        db_execution = Execution(**execution.model_dump())
+        db_execution = Execution(**dto_to_dict(execution))
 
         self.db.add(db_execution)
         await self.db.commit()

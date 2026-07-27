@@ -3,6 +3,8 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.utils.dto import dto_to_dict, update_model_from_dto
+
 from .models import Conversation
 from .schemas import ConversationCreate, ConversationUpdate
 
@@ -15,7 +17,7 @@ class ConversationRepository:
         self,
         conversation_data: ConversationCreate,
     ) -> Conversation:
-        conversation = Conversation(**conversation_data.model_dump())
+        conversation = Conversation(**dto_to_dict(conversation_data))
 
         self.db.add(conversation)
         await self.db.commit()
@@ -42,8 +44,7 @@ class ConversationRepository:
         conversation: Conversation,
         conversation_data: ConversationUpdate,
     ) -> Conversation:
-        for key, value in conversation_data.model_dump(exclude_unset=True).items():
-            setattr(conversation, key, value)
+        update_model_from_dto(conversation, conversation_data)
 
         await self.db.commit()
         await self.db.refresh(conversation)

@@ -1,9 +1,11 @@
+import time
 from collections.abc import AsyncIterator
 from typing import Any
 
 from google import genai
 
 from app.entities.messages.models import Message
+from app.llms.schemas import ChatResult, Usage
 
 from .base import BaseProvider
 
@@ -42,13 +44,32 @@ class GeminiProvider(BaseProvider):
     async def chat(
         self,
         history: list[Message],
-    ) -> str:
+    ) -> ChatResult:
+        start = time.perf_counter()
+
         response = await self.client.aio.models.generate_content(
             model=self.model,
             contents=self._build_contents(history),
         )
 
-        return response.text or ""
+        latency_ms = int((time.perf_counter() - start) * 1000)
+
+        usage_metadata = response.usage_metadata
+
+        usage = Usage(
+            input_tokens=int(getattr(usage_metadata, "prompt_token_count", 0) or 0),
+            output_tokens=int(
+                getattr(usage_metadata, "candidates_token_count", 0) or 0
+            ),
+            total_tokens=int(getattr(usage_metadata, "total_token_count", 0) or 0),
+        )
+
+        return ChatResult(
+            text=response.text or "",
+            usage=usage,
+            model=self.model,
+            latency_ms=latency_ms,
+        )
 
     async def stream_chat(
         self,

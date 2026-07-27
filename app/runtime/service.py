@@ -48,7 +48,9 @@ class RuntimeService:
         # and give some kind of system prompt to llm to figure out if user is asking something
         # that will require tool access like making a project, getting todays weather etc
 
-        reply = await self.llm_service.chat(history)
+        chat_result = await self.llm_service.chat(history)
+
+        reply = chat_result.text
 
         assistant_message = await self.message_service.create_message(
             messages_schemas.MessageCreate(
@@ -63,6 +65,9 @@ class RuntimeService:
             user_message_id=user_message.id,
             assistant_message_id=assistant_message.id,
             reply=assistant_message.content,
+            usage=chat_result.usage,
+            model=chat_result.model,
+            latency_ms=chat_result.latency_ms,
         )
 
     async def stream_chat(

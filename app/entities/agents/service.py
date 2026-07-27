@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from app.utils.dto import dto_to_dict, update_model_from_dto
+
 from .exceptions import AgentAlreadyExists, AgentNotFound
 from .models import Agent
 from .repository import AgentRepository
@@ -16,17 +18,9 @@ class AgentService:
         if existing:
             raise AgentAlreadyExists()
 
-        agent = Agent(
-            name=data.name,
-            description=data.description,
-            system_prompt=data.system_prompt,
-            model_id=data.model_id,
-            temperature=data.temperature,
-            max_iterations=data.max_iterations,
-            status=data.status,
-        )
-        created_agent: Agent = self.repository.create(agent=agent)
-        return created_agent
+        agent = Agent(**dto_to_dict(data))
+
+        return self.repository.create(agent)
 
     def get(self, agent_id: UUID) -> Agent:
         agent = self.repository.get(agent_id)
@@ -34,8 +28,7 @@ class AgentService:
         if agent is None:
             raise AgentNotFound()
 
-        retrived_agent: Agent = agent
-        return retrived_agent
+        return agent
 
     def agent_list(self) -> list[Agent]:
         return self.repository.list()
@@ -43,13 +36,9 @@ class AgentService:
     def update(self, agent_id: UUID, data: AgentUpdate) -> Agent:
         agent = self.get(agent_id)
 
-        update_data = data.model_dump(exclude_unset=True)
+        update_model_from_dto(agent, data)
 
-        for field, value in update_data.items():
-            setattr(agent, field, value)
-
-        updated_agent: Agent = self.repository.update(agent)
-        return updated_agent
+        return self.repository.update(agent)
 
     def delete(self, agent_id: UUID) -> None:
         agent = self.get(agent_id)

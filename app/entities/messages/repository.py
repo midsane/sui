@@ -1,10 +1,10 @@
-from __future__ import annotations
-
 import builtins
 from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.utils.dto import dto_to_dict, update_model_from_dto
 
 from .models import Message
 from .schemas import MessageCreate, MessageUpdate
@@ -18,7 +18,7 @@ class MessageRepository:
         self,
         message_data: MessageCreate,
     ) -> Message:
-        message = Message(**message_data.model_dump())
+        message = Message(**dto_to_dict(message_data))
 
         self.db.add(message)
         await self.db.commit()
@@ -58,8 +58,7 @@ class MessageRepository:
         message: Message,
         message_data: MessageUpdate,
     ) -> Message:
-        for key, value in message_data.model_dump(exclude_unset=True).items():
-            setattr(message, key, value)
+        update_model_from_dto(message, message_data)
 
         await self.db.commit()
         await self.db.refresh(message)

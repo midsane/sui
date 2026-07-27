@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
 
 from app.entities.messages.models import Message
+from app.llms.schemas import ChatResult
 
 
 class BaseProvider(ABC):
@@ -9,7 +10,7 @@ class BaseProvider(ABC):
     async def chat(
         self,
         history: list[Message],
-    ) -> str: ...
+    ) -> ChatResult: ...
 
     @abstractmethod
     def stream_chat(

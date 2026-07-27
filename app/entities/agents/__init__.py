@@ -11,18 +11,3 @@ __all__ = [
     "agent_exception",
     "agent_schemas",
 ]
-
-# Agent
-# │
-# ├── Execution
-# │   ├── ExecutionLog
-# │   ├── ToolCall
-# │   ├── LLMCall
-# │   ├── Evaluation
-# │   └── Reflection
-# │
-# ├── Memory
-# │
-# ├── ToolPermission
-# │
-# └── Model

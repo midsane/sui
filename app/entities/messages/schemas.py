@@ -1,30 +1,24 @@
-from datetime import datetime
+from dataclasses import dataclass
 from uuid import UUID
-
-from pydantic import BaseModel, ConfigDict
 
 from app.types import MessageRole
 
 
-class MessageCreate(BaseModel):
+@dataclass(slots=True)
+class MessageCreate:
     conversation_id: UUID
     role: MessageRole
     content: str
 
+    def __post_init__(self) -> None:
+        if not self.content.strip():
+            raise ValueError("content cannot be empty")
 
-class MessageUpdate(BaseModel):
+
+@dataclass(slots=True)
+class MessageUpdate:
     content: str
 
-
-class MessageResponse(BaseModel):
-    id: UUID
-
-    conversation_id: UUID
-
-    role: MessageRole
-
-    content: str
-
-    created_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
+    def __post_init__(self) -> None:
+        if not self.content.strip():
+            raise ValueError("content cannot be empty")

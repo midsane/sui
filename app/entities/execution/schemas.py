@@ -1,17 +1,18 @@
+from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
-
-from pydantic import BaseModel, ConfigDict
 
 from app.types import ExecutionStatus
 
 
-class ExecutionCreate(BaseModel):
+@dataclass(slots=True)
+class ExecutionCreate:
     task: str
     agent_id: UUID
 
 
-class ExecutionUpdate(BaseModel):
+@dataclass(slots=True)
+class ExecutionUpdate:
     status: ExecutionStatus | None = None
     current_step: str | None = None
     logs: str | None = None
@@ -24,28 +25,11 @@ class ExecutionUpdate(BaseModel):
     result: str | None = None
     finished_at: datetime | None = None
 
+    def __post_init__(self) -> None:
+        for field_name in ("input_tokens", "output_tokens", "total_tokens"):
+            value = getattr(self, field_name)
+            if value is not None and value < 0:
+                raise ValueError(f"{field_name} cannot be negative")
 
-class ExecutionResponse(BaseModel):
-    id: UUID
-
-    task: str
-    agent_id: UUID
-
-    status: ExecutionStatus
-
-    current_step: str
-    logs: str
-
-    input_tokens: int
-    output_tokens: int
-    total_tokens: int
-    estimated_cost: float
-
-    result: str | None
-
-    started_at: datetime
-    finished_at: datetime | None
-
-    parent_execution_id: UUID | None
-
-    model_config = ConfigDict(from_attributes=True)
+        if self.estimated_cost is not None and self.estimated_cost < 0:
+            raise ValueError("estimated_cost cannot be negative")

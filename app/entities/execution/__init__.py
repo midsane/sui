@@ -11,18 +11,3 @@ __all__ = [
     "execution_exception",
     "execution_schemas",
 ]
-
-# Agent
-# │
-# ├── Execution
-# │   ├── ExecutionLog
-# │   ├── ToolCall
-# │   ├── LLMCall
-# │   ├── Evaluation
-# │   └── Reflection
-# │
-# ├── Memory
-# │
-# ├── ToolPermission
-# │
-# └── Model
