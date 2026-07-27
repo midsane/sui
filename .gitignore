@@ -10,3 +10,6 @@ __pycache__/
 *$py.class
 .env
 **/migrations/versions/__pycache__/
+
+dist/*
+midsane_sui.egg-info
