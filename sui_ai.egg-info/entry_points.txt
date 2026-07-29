@@ -1,0 +1,2 @@
+[console_scripts]
+sui = app.terminal.main:main

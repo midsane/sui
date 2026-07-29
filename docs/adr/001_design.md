@@ -1,10 +1,7 @@
 User
   │
   ▼
-Chat API
-  │
-  ▼
-Orchestrator
+runtime
   │
   ├── Normal chat
   │      └── Answer immediately
@@ -27,7 +24,7 @@ Workspace
 └── .sui/
 
 
-POST /chat
+POST /terminal input
 
 ↓
 

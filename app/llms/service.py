@@ -1,4 +1,5 @@
 from collections.abc import AsyncIterator
+from typing import TypeVar
 
 from app.config.service import ConfigService
 from app.entities.messages.models import Message
@@ -7,6 +8,8 @@ from app.types import MessageRole
 
 from .providers.factory import ProviderFactory
 from .schemas import ChatResult
+
+T = TypeVar("T")
 
 TITLE_PROMPT = """
 Generate a concise conversation title.
@@ -54,7 +57,8 @@ class LLMService:
         self,
         messages: list[Message],
         system_prompt: str | None = None,
-    ) -> ChatResult:
+        response_model: type[T] | None = None,
+    ) -> ChatResult[T] | ChatResult[str]:
         history = messages
 
         if system_prompt is not None:
@@ -65,6 +69,12 @@ class LLMService:
                 ),
                 *messages,
             ]
+
+        if response_model is not None:
+            return await self._provider().structured_llm_call(
+                history,
+                response_model,
+            )
 
         return await self._provider().llm_call(history)
 
@@ -90,7 +100,7 @@ class LLMService:
         self,
         prompt: str,
     ) -> str:
-        response = await self.llm_call(
+        response: ChatResult[str] = await self.llm_call(
             messages=[
                 Message(
                     role=MessageRole.USER,
