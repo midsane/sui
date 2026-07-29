@@ -15,6 +15,7 @@ from app.execution.reflection.reflector import Reflector
 from app.execution.requirements.agent import RequirementAgent
 from app.execution.requirements.schemas import RequirementStatus
 from app.execution.tools.registry import ToolRegistry
+from app.llms.schemas import StructuredOutputError
 from app.llms.service import LLMService
 from app.types import ExecutionStatus, MessageRole
 
@@ -70,21 +71,33 @@ class ExecutionService:
 
             yield "📋 Gathering requirements...\n"
 
-            requirements_result = await self.requirement_agent.gather(
-                [Message(role=MessageRole.USER, content=prompt)]
-            )
-            if requirements_result.status == RequirementStatus.NEEDS_INPUT:
+            try:
+                requirements_result = await self.requirement_agent.gather(
+                    [Message(role=MessageRole.USER, content=prompt)]
+                )
+            except StructuredOutputError as e:
+                yield f"⚠️  Could not parse requirements from LLM. Raw output: {e.raw_output}\n"
+                yield "Proceeding with full prompt as requirements...\n"
+                requirements_result = None
+
+            if requirements_result is None:
+                pass
+            elif requirements_result.status == RequirementStatus.NEEDS_INPUT:
                 yield f"❓ {requirements_result.question}\n"
                 return
-
-            yield f"✓ Requirements: {requirements_result.summary}\n"
+            else:
+                yield f"✓ Requirements: {requirements_result.summary}\n"
 
             yield "🤖 Creating execution plan...\n"
             available_tools = [
                 tool.name for tool in self.tool_registry.list_available()
             ]
+            requirements_text = prompt
+            if requirements_result is not None and requirements_result.summary:
+                requirements_text = requirements_result.summary
+
             plan = await self.planner.plan(
-                requirements_result.summary or prompt,
+                requirements_text,
                 tools_available=available_tools,
             )
 
