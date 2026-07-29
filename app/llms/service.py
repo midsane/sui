@@ -23,33 +23,33 @@ Rules:
 
 
 class LLMService:
-    _provider_instance: BaseProvider | None = None
-
     def __init__(
         self,
         config_service: ConfigService,
     ) -> None:
         self.config_service = config_service
+        self._provider_instance: BaseProvider | None = None
+        self._provider_fingerprint: tuple[str, str, str] | None = None
 
     def _provider(self) -> BaseProvider:
-        if self._provider_instance is not None:
+        entry = self.config_service.get_active_key()
+
+        # Rebuild when the selected key, its secret, or its model changes, so
+        # switching keys takes effect without restarting.
+        fingerprint = (entry.provider.value, entry.api_key, entry.model)
+
+        if (
+            self._provider_instance is not None
+            and self._provider_fingerprint == fingerprint
+        ):
             return self._provider_instance
 
-        config = self.config_service.load_config()
-
-        if config.active_provider is None:
-            raise RuntimeError("No provider configured.")
-
-        if config.default_model is None:
-            raise RuntimeError("No model selected.")
-
         self._provider_instance = ProviderFactory.create(
-            provider=config.active_provider,
-            api_key=self.config_service.get_api_key(
-                config.active_provider,
-            ),
-            model=config.default_model,
+            provider=entry.provider,
+            api_key=entry.api_key,
+            model=entry.model,
         )
+        self._provider_fingerprint = fingerprint
 
         return self._provider_instance
 

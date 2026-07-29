@@ -58,7 +58,7 @@ class GeminiProvider(BaseProvider):
     async def llm_call(
         self,
         messages: list[Message],
-    ) -> ChatResult:
+    ) -> ChatResult[str]:
         start = time.perf_counter()
 
         response = await self.client.aio.models.generate_content(

@@ -34,6 +34,11 @@ app/entities/execution/models.py
 app/entities/execution/repository.py
 app/entities/execution/schemas.py
 app/entities/execution/service.py
+app/entities/execution_sessions/__init__.py
+app/entities/execution_sessions/models.py
+app/entities/execution_sessions/repository.py
+app/entities/execution_sessions/schemas.py
+app/entities/execution_sessions/service.py
 app/entities/messages/__init__.py
 app/entities/messages/exceptions.py
 app/entities/messages/models.py
@@ -45,6 +50,7 @@ app/execution/exceptions.py
 app/execution/schemas.py
 app/execution/service.py
 app/execution/session.py
+app/execution/state_manager.py
 app/execution/evaluation/__init__.py
 app/execution/evaluation/evaluator.py
 app/execution/evaluation/prompts.py
@@ -65,6 +71,14 @@ app/execution/requirements/__init__.py
 app/execution/requirements/agent.py
 app/execution/requirements/prompts.py
 app/execution/requirements/schemas.py
+app/execution/tools/__init__.py
+app/execution/tools/base.py
+app/execution/tools/bash_tool.py
+app/execution/tools/context.py
+app/execution/tools/file_tool.py
+app/execution/tools/http_tool.py
+app/execution/tools/registry.py
+app/execution/tools/schemas.py
 app/llms/__init__.py
 app/llms/schemas.py
 app/llms/service.py

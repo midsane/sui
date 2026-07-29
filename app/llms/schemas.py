@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 T = TypeVar("T")
 
@@ -12,7 +12,7 @@ class Usage:
 
 
 @dataclass(slots=True, frozen=True)
-class ChatResult(Generic[T]):
+class ChatResult[T]:
     text: T
     usage: Usage
     model: str

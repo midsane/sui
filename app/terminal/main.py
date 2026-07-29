@@ -76,13 +76,23 @@ async def run() -> None:
             status.start()
 
             first_chunk = True
-            async for chunk in runtime.stream_chat(prompt):
-                if first_chunk:
-                    status.stop()
-                    console.print("[bold green]✦[/bold green] ", end="")
-                    first_chunk = False
+            try:
+                async for chunk in runtime.stream_chat(prompt):
+                    if first_chunk:
+                        status.stop()
+                        console.print("[bold green]✦[/bold green] ", end="")
+                        first_chunk = False
 
-                print(chunk, end="", flush=True)
+                    print(chunk, end="", flush=True)
+            except KeyboardInterrupt:
+                console.print("\n[yellow]⏹ Interrupted.[/yellow]")
+            except Exception as e:
+                # Keep the session alive: a failed provider call should not
+                # take down the whole REPL.
+                console.print(f"\n[red]✗ {e}[/red]")
+            finally:
+                # Without this the spinner keeps running over the error.
+                status.stop()
 
             elapsed = time.perf_counter() - start
 

@@ -1,3 +1,5 @@
+from typing import Any
+
 from app.entities.messages.models import Message
 from app.llms.service import LLMService
 
@@ -77,7 +79,7 @@ class IntentRouter:
         self,
         history: list[Message],
     ) -> Intent:
-        result = await self.llm_service.llm_call(
+        result: Any = await self.llm_service.llm_call(
             messages=history,
             system_prompt=SYSTEM_PROMPT,
         )

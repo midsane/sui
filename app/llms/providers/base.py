@@ -3,7 +3,7 @@ import re
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
 from dataclasses import is_dataclass
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
 from pydantic import TypeAdapter
 
@@ -85,10 +85,12 @@ class BaseProvider(ABC):
             raise StructuredOutputError(response_model, result.text, e) from e
 
         try:
+            instance: T
             if is_dataclass(response_model):
-                instance = response_model(**parsed_json)
+                # is_dataclass narrows to type[DataclassInstance], losing T.
+                instance = cast("T", response_model(**parsed_json))
             else:
-                adapter = TypeAdapter(response_model)
+                adapter: TypeAdapter[T] = TypeAdapter(response_model)
                 instance = adapter.validate_python(parsed_json)
 
             return ChatResult(

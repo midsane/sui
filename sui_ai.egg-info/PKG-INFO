@@ -16,6 +16,7 @@ Requires-Dist: sqlalchemy>=2.0.51
 Requires-Dist: alembic>=1.18.5
 Requires-Dist: psycopg[binary]>=3.3.4
 Requires-Dist: google-genai>=2.14.0
+Requires-Dist: httpx>=0.28.1
 Requires-Dist: rich>=15.0.0
 
 Entities:

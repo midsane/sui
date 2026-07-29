@@ -61,7 +61,9 @@ class RuntimeService:
     ) -> ChatResponse:
         history = await self._prepare_chat(prompt)
 
-        result = await self.llm_service.llm_call(history)
+        from typing import Any
+
+        result: Any = await self.llm_service.llm_call(history)
         if self.active_conversation_id is None:
             raise RuntimeError("Invalid conversation id")
 

@@ -2,4 +2,5 @@ sqlalchemy>=2.0.51
 alembic>=1.18.5
 psycopg[binary]>=3.3.4
 google-genai>=2.14.0
+httpx>=0.28.1
 rich>=15.0.0
