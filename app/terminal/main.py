@@ -7,7 +7,9 @@ from app.config.service import ConfigService
 from app.db import AsyncSessionLocal
 from app.entities.conversations import ConversationRepository, ConversationService
 from app.entities.messages import MessageRepository, MessageService
+from app.execution.service import ExecutionService
 from app.llms.service import LLMService
+from app.runtime.intent import IntentRouter
 from app.runtime.service import RuntimeService
 
 from .commands import CommandHandler
@@ -25,10 +27,16 @@ async def run() -> None:
 
         llm_service = LLMService(config_service)
 
+        intent_router = IntentRouter(llm_service)
+
+        execution_service = ExecutionService()
+
         runtime = RuntimeService(
-            conversation_service,
-            message_service,
-            llm_service,
+            conversation_service=conversation_service,
+            message_service=message_service,
+            llm_service=llm_service,
+            execution_service=execution_service,
+            intent_router=intent_router,
         )
 
         command_handler = CommandHandler(config_service, runtime_service=runtime)

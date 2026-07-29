@@ -85,7 +85,7 @@ class CommandHandler:
 
         await self.runtime_service.set_active_conversation(conversation.id)
 
-        messages = await self.runtime_service.get_conversations_messages(
+        messages = await self.runtime_service.get_conversation_messages(
             conversation.id,
         )
         console.clear()

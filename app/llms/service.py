@@ -3,9 +3,20 @@ from collections.abc import AsyncIterator
 from app.config.service import ConfigService
 from app.entities.messages.models import Message
 from app.llms.providers.base import BaseProvider
+from app.types import MessageRole
 
 from .providers.factory import ProviderFactory
 from .schemas import ChatResult
+
+TITLE_PROMPT = """
+Generate a concise conversation title.
+
+Rules:
+- Maximum 5 words.
+- Do not use quotation marks.
+- Do not use markdown.
+- Return only the title.
+""".strip()
 
 
 class LLMService:
@@ -20,13 +31,14 @@ class LLMService:
     def _provider(self) -> BaseProvider:
         if self._provider_instance is not None:
             return self._provider_instance
+
         config = self.config_service.load_config()
 
         if config.active_provider is None:
             raise RuntimeError("No provider configured.")
 
         if config.default_model is None:
-            raise RuntimeError("No model selected")
+            raise RuntimeError("No model selected.")
 
         self._provider_instance = ProviderFactory.create(
             provider=config.active_provider,
@@ -38,20 +50,54 @@ class LLMService:
 
         return self._provider_instance
 
-    async def chat(
+    async def llm_call(
         self,
-        history: list[Message],
+        messages: list[Message],
+        system_prompt: str | None = None,
     ) -> ChatResult:
-        return await self._provider().chat(history)
+        history = messages
 
-    def stream_chat(
+        if system_prompt is not None:
+            history = [
+                Message(
+                    role=MessageRole.SYSTEM,
+                    content=system_prompt,
+                ),
+                *messages,
+            ]
+
+        return await self._provider().llm_call(history)
+
+    def stream_llm_call(
         self,
-        history: list[Message],
+        messages: list[Message],
+        system_prompt: str | None = None,
     ) -> AsyncIterator[str]:
-        return self._provider().stream_chat(history)
+        history = messages
+
+        if system_prompt is not None:
+            history = [
+                Message(
+                    role=MessageRole.SYSTEM,
+                    content=system_prompt,
+                ),
+                *messages,
+            ]
+
+        return self._provider().stream_llm_call(history)
 
     async def generate_title(
         self,
         prompt: str,
     ) -> str:
-        return await self._provider().generate_title(prompt)
+        response = await self.llm_call(
+            messages=[
+                Message(
+                    role=MessageRole.USER,
+                    content=prompt,
+                )
+            ],
+            system_prompt=TITLE_PROMPT,
+        )
+
+        return response.text.strip()

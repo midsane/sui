@@ -1,3 +1,4 @@
+from enum import Enum
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -15,3 +16,8 @@ class ChatResponse(BaseModel):
     usage: Usage
     model: str
     latency_ms: int
+
+
+class Intent(Enum):
+    CHAT = "chat"
+    EXECUTE = "execute"

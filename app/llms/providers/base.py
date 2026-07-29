@@ -7,19 +7,17 @@ from app.llms.schemas import ChatResult
 
 class BaseProvider(ABC):
     @abstractmethod
-    async def chat(
+    async def llm_call(
         self,
-        history: list[Message],
-    ) -> ChatResult: ...
+        messages: list[Message],
+    ) -> ChatResult:
+        """Perform a single non-streaming LLM completion."""
+        raise NotImplementedError
 
     @abstractmethod
-    def stream_chat(
+    def stream_llm_call(
         self,
-        history: list[Message],
-    ) -> AsyncIterator[str]: ...
-
-    @abstractmethod
-    async def generate_title(
-        self,
-        prompt: str,
-    ) -> str: ...
+        messages: list[Message],
+    ) -> AsyncIterator[str]:
+        """Perform a streaming LLM completion."""
+        raise NotImplementedError

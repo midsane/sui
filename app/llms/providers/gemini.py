@@ -6,6 +6,7 @@ from google import genai
 
 from app.entities.messages.models import Message
 from app.llms.schemas import ChatResult, Usage
+from app.types import MessageRole
 
 from .base import BaseProvider
 
@@ -21,12 +22,25 @@ class GeminiProvider(BaseProvider):
 
     def _build_contents(
         self,
-        history: list[Message],
+        messages: list[Message],
     ) -> list[dict[str, Any]]:
-        contents = []
+        contents: list[dict[str, Any]] = []
 
-        for message in history:
-            role = "model" if message.role.value.lower() == "assistant" else "user"
+        for message in messages:
+            match message.role:
+                case MessageRole.USER:
+                    role = "user"
+
+                case MessageRole.ASSISTANT:
+                    role = "model"
+
+                case MessageRole.SYSTEM:
+                    # Gemini doesn't support a separate "system" role
+                    # so we send it as a user message.
+                    role = "user"
+
+                case _:
+                    role = "user"
 
             contents.append(
                 {
@@ -41,15 +55,15 @@ class GeminiProvider(BaseProvider):
 
         return contents
 
-    async def chat(
+    async def llm_call(
         self,
-        history: list[Message],
+        messages: list[Message],
     ) -> ChatResult:
         start = time.perf_counter()
 
         response = await self.client.aio.models.generate_content(
             model=self.model,
-            contents=self._build_contents(history),
+            contents=self._build_contents(messages),
         )
 
         latency_ms = int((time.perf_counter() - start) * 1000)
@@ -57,11 +71,30 @@ class GeminiProvider(BaseProvider):
         usage_metadata = response.usage_metadata
 
         usage = Usage(
-            input_tokens=int(getattr(usage_metadata, "prompt_token_count", 0) or 0),
-            output_tokens=int(
-                getattr(usage_metadata, "candidates_token_count", 0) or 0
+            input_tokens=int(
+                getattr(
+                    usage_metadata,
+                    "prompt_token_count",
+                    0,
+                )
+                or 0
             ),
-            total_tokens=int(getattr(usage_metadata, "total_token_count", 0) or 0),
+            output_tokens=int(
+                getattr(
+                    usage_metadata,
+                    "candidates_token_count",
+                    0,
+                )
+                or 0
+            ),
+            total_tokens=int(
+                getattr(
+                    usage_metadata,
+                    "total_token_count",
+                    0,
+                )
+                or 0
+            ),
         )
 
         return ChatResult(
@@ -71,13 +104,13 @@ class GeminiProvider(BaseProvider):
             latency_ms=latency_ms,
         )
 
-    async def stream_chat(
+    async def stream_llm_call(
         self,
-        history: list[Message],
+        messages: list[Message],
     ) -> AsyncIterator[str]:
         stream: Any = await self.client.aio.models.generate_content_stream(
             model=self.model,
-            contents=self._build_contents(history),
+            contents=self._build_contents(messages),
         )
 
         async for chunk in stream:
@@ -85,18 +118,3 @@ class GeminiProvider(BaseProvider):
 
             if text:
                 yield text
-
-    async def generate_title(
-        self,
-        prompt: str,
-    ) -> str:
-        response = await self.client.aio.models.generate_content(
-            model=self.model,
-            contents=(
-                "Generate a concise conversation title "
-                "(maximum 5 words).\n\n"
-                f"User prompt: {prompt}"
-            ),
-        )
-
-        return (response.text or "").strip()
