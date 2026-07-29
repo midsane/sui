@@ -33,8 +33,10 @@ class Reflector:
             ReflectionResult with corrected step and fix strategy
         """
         outputs_text = "\n".join(
-            [f"- {output.get('tool')}: {output.get('output')}"
-             for output in tool_outputs]
+            [
+                f"- {output.get('tool')}: {output.get('output')}"
+                for output in tool_outputs
+            ]
         )
 
         prompt = f"""
@@ -43,7 +45,7 @@ Original Step: {original_step.description}
 Tool Outputs:
 {outputs_text}
 
-{f'Error Analysis: {error_analysis}' if error_analysis else ''}
+{f"Error Analysis: {error_analysis}" if error_analysis else ""}
 
 Analyze why this step failed and suggest a corrected version.
 """
@@ -62,6 +64,4 @@ Analyze why this step failed and suggest a corrected version.
         if isinstance(result.text, ReflectionResult):
             return result.text
 
-        raise ValueError(
-            f"Expected ReflectionResult, got {type(result.text)}"
-        )
+        raise ValueError(f"Expected ReflectionResult, got {type(result.text)}")

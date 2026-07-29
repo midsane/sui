@@ -4,9 +4,9 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Text, func
+from sqlalchemy import DateTime, Enum, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
 from app.types import ExecutionStatus
@@ -49,7 +49,8 @@ class ExecutionSession(Base):
         nullable=False,
     )
 
-    metadata: Mapped[dict[str, Any]] = mapped_column(
+    session_metadata: Mapped[dict[str, Any]] = mapped_column(
+        "metadata",
         JSONB,
         default=dict,
         nullable=False,

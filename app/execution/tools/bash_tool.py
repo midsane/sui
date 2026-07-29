@@ -116,7 +116,7 @@ class BashTool(IToolProvider):
                     process.communicate(),
                     timeout=timeout,
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 process.kill()
                 return ToolOutput(
                     tool_name="bash",
@@ -148,4 +148,4 @@ class BashTool(IToolProvider):
             )
 
         except Exception as e:
-            raise ToolExecutionError("bash", str(e))
+            raise ToolExecutionError("bash", str(e)) from e

@@ -20,7 +20,7 @@ class ExecutionSessionUpdate:
     requirements: dict[str, Any] | None = None
     plan: dict[str, Any] | None = None
     outputs: list[dict[str, Any]] | None = None
-    metadata: dict[str, Any] | None = None
+    session_metadata: dict[str, Any] | None = None
     started_at: Any | None = None
     finished_at: Any | None = None
     cancelled_at: Any | None = None
@@ -38,7 +38,7 @@ class ExecutionSessionResponse:
     plan: dict[str, Any] | None
     current_step_index: int
     outputs: list[dict[str, Any]]
-    metadata: dict[str, Any]
+    session_metadata: dict[str, Any]
     created_at: Any
     updated_at: Any
     started_at: Any | None

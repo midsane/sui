@@ -32,8 +32,10 @@ class Evaluator:
             EvaluationResult with success/failure assessment
         """
         outputs_text = "\n".join(
-            [f"- {output.get('tool')}: {output.get('output')}"
-             for output in tool_outputs]
+            [
+                f"- {output.get('tool')}: {output.get('output')}"
+                for output in tool_outputs
+            ]
         )
 
         prompt = f"""
@@ -42,7 +44,7 @@ Step: {step_description}
 Tool Outputs:
 {outputs_text}
 
-{f'Expected: {expected_outcome}' if expected_outcome else ''}
+{f"Expected: {expected_outcome}" if expected_outcome else ""}
 
 Evaluate whether this step succeeded.
 """
@@ -61,6 +63,4 @@ Evaluate whether this step succeeded.
         if isinstance(result.text, EvaluationResult):
             return result.text
 
-        raise ValueError(
-            f"Expected EvaluationResult, got {type(result.text)}"
-        )
+        raise ValueError(f"Expected EvaluationResult, got {type(result.text)}")

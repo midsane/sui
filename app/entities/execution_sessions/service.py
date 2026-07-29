@@ -1,3 +1,4 @@
+from datetime import UTC
 from uuid import UUID
 
 from app.types import ExecutionStatus
@@ -34,25 +35,25 @@ class ExecutionSessionService:
 
     async def start_session(self, session_id: UUID) -> ExecutionSession | None:
         """Start a session (move to RUNNING)."""
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         return await self.repository.update(
             session_id,
             ExecutionSessionUpdate(
                 status=ExecutionStatus.RUNNING,
-                started_at=datetime.now(timezone.utc),
+                started_at=datetime.now(UTC),
             ),
         )
 
     async def complete_session(self, session_id: UUID) -> ExecutionSession | None:
         """Complete a session."""
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         return await self.repository.update(
             session_id,
             ExecutionSessionUpdate(
                 status=ExecutionStatus.COMPLETED,
-                finished_at=datetime.now(timezone.utc),
+                finished_at=datetime.now(UTC),
             ),
         )
 
@@ -62,14 +63,14 @@ class ExecutionSessionService:
         error_reason: str | None = None,
     ) -> ExecutionSession | None:
         """Mark session as failed."""
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         return await self.repository.update(
             session_id,
             ExecutionSessionUpdate(
                 status=ExecutionStatus.FAILED,
-                finished_at=datetime.now(timezone.utc),
-                metadata={"error": error_reason} if error_reason else None,
+                finished_at=datetime.now(UTC),
+                session_metadata={"error": error_reason} if error_reason else None,
             ),
         )
 
@@ -79,13 +80,13 @@ class ExecutionSessionService:
         reason: str | None = None,
     ) -> ExecutionSession | None:
         """Cancel a session."""
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         return await self.repository.update(
             session_id,
             ExecutionSessionUpdate(
                 status=ExecutionStatus.CANCELLED,
-                cancelled_at=datetime.now(timezone.utc),
+                cancelled_at=datetime.now(UTC),
                 cancellation_reason=reason,
             ),
         )
@@ -93,7 +94,7 @@ class ExecutionSessionService:
     async def add_output(
         self,
         session_id: UUID,
-        output: dict,
+        output: dict[str, object],
     ) -> ExecutionSession | None:
         """Add output to a session."""
         return await self.repository.add_output(session_id, output)

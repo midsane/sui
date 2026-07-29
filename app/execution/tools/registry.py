@@ -1,5 +1,3 @@
-from typing import Any
-
 from .base import IToolProvider, ToolExecutionError
 from .context import ToolContext
 from .schemas import ToolInfo, ToolOutput, ToolPermissionLevel
@@ -8,7 +6,7 @@ from .schemas import ToolInfo, ToolOutput, ToolPermissionLevel
 class ToolRegistry:
     """Registry for tool discovery, validation, and execution."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._tools: dict[str, IToolProvider] = {}
         self._permissions: dict[str, ToolPermissionLevel] = {}
 

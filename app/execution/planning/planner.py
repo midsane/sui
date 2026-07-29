@@ -3,7 +3,7 @@ from app.llms.service import LLMService
 from app.types import MessageRole
 
 from .prompts import PLANNER_PROMPT
-from .schemas import ExecutionPlan, PlanStep, ToolCall
+from .schemas import ExecutionPlan
 
 
 class Planner:

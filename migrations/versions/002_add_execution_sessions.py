@@ -43,9 +43,7 @@ def upgrade() -> None:
             nullable=False,
             server_default="{}",
         ),
-        sa.Column(
-            "plan", postgresql.JSONB(astext_type=sa.Text()), nullable=True
-        ),
+        sa.Column("plan", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column(
             "current_step_index", sa.Integer(), nullable=False, server_default="0"
         ),
@@ -95,9 +93,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_index(
-        op.f("ix_execution_sessions_status"), table_name="execution_sessions"
-    )
+    op.drop_index(op.f("ix_execution_sessions_status"), table_name="execution_sessions")
     op.drop_index(
         op.f("ix_execution_sessions_user_id"), table_name="execution_sessions"
     )

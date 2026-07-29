@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from typing import Any
 
@@ -95,7 +94,7 @@ class FileTool(IToolProvider):
                     error_message=f"Unknown action: {action}",
                 )
         except Exception as e:
-            raise ToolExecutionError("file", str(e))
+            raise ToolExecutionError("file", str(e)) from e
 
     def _read_file(self, path: Path) -> ToolOutput:
         """Read file contents."""

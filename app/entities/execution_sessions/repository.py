@@ -24,7 +24,7 @@ class ExecutionSessionRepository:
             user_id=session_create.user_id,
             task=session_create.task,
             description=session_create.description,
-            metadata=session_create.metadata,
+            session_metadata=session_create.metadata,
         )
         self.db.add(session)
         await self.db.flush()
@@ -62,8 +62,8 @@ class ExecutionSessionRepository:
         if update.outputs is not None:
             session.outputs = update.outputs
 
-        if update.metadata is not None:
-            session.metadata = update.metadata
+        if update.session_metadata is not None:
+            session.session_metadata = update.session_metadata
 
         if update.started_at is not None:
             session.started_at = update.started_at
@@ -94,7 +94,7 @@ class ExecutionSessionRepository:
             .limit(limit)
             .offset(offset)
         )
-        return result.scalars().all()
+        return list(result.scalars().all())
 
     async def list_active_sessions(
         self,
@@ -113,12 +113,12 @@ class ExecutionSessionRepository:
                 ),
             )
         )
-        return result.scalars().all()
+        return list(result.scalars().all())
 
     async def add_output(
         self,
         session_id: UUID,
-        output: dict,
+        output: dict[str, object],
     ) -> ExecutionSession | None:
         """Add output to execution session."""
         session = await self.get_by_id(session_id)

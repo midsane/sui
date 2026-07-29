@@ -1,6 +1,5 @@
 from app.entities.messages.models import Message
 from app.llms.service import LLMService
-from app.types import MessageRole
 
 from .prompts import REQUIREMENT_PROMPT
 from .schemas import RequirementResponse
@@ -32,6 +31,4 @@ class RequirementAgent:
         if isinstance(result.text, RequirementResponse):
             return result.text
 
-        raise ValueError(
-            f"Expected RequirementResponse, got {type(result.text)}"
-        )
+        raise ValueError(f"Expected RequirementResponse, got {type(result.text)}")

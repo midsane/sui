@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from app.entities.execution_sessions.models import ExecutionSession
 from app.types import ExecutionStatus
 
@@ -5,7 +7,7 @@ from app.types import ExecutionStatus
 class ExecutionStateManager:
     """Manages state transitions for execution sessions."""
 
-    VALID_TRANSITIONS = {
+    VALID_TRANSITIONS: ClassVar[dict[ExecutionStatus, list[ExecutionStatus]]] = {
         ExecutionStatus.PENDING: [
             ExecutionStatus.RUNNING,
             ExecutionStatus.CANCELLED,
@@ -53,9 +55,7 @@ class ExecutionStateManager:
             ValueError: If transition is invalid
         """
         if not ExecutionStateManager.is_valid_transition(session.status, to_status):
-            raise ValueError(
-                f"Cannot transition from {session.status} to {to_status}"
-            )
+            raise ValueError(f"Cannot transition from {session.status} to {to_status}")
 
     @staticmethod
     def can_retry(session: ExecutionSession) -> bool:

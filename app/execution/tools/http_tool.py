@@ -1,5 +1,3 @@
-import asyncio
-import json
 from typing import Any
 
 from .base import IToolProvider, ToolExecutionError
@@ -120,9 +118,7 @@ class HttpTool(IToolProvider):
                         tool_name="http",
                         success=success,
                         output=response_text,
-                        error_message=None
-                        if success
-                        else f"HTTP {response.status}",
+                        error_message=None if success else f"HTTP {response.status}",
                         metadata={
                             "status_code": response.status,
                             "headers": response_headers,
@@ -130,7 +126,7 @@ class HttpTool(IToolProvider):
                         },
                     )
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return ToolOutput(
                 tool_name="http",
                 success=False,
@@ -138,4 +134,4 @@ class HttpTool(IToolProvider):
                 error_message=f"Request timeout after {timeout} seconds",
             )
         except Exception as e:
-            raise ToolExecutionError("http", str(e))
+            raise ToolExecutionError("http", str(e)) from e
