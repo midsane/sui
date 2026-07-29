@@ -56,6 +56,7 @@ class ExecutionService:
         if user_id is None:
             user_id = uuid4()
 
+        session = None
         try:
             yield "🚀 Starting execution...\n"
 
@@ -104,5 +105,6 @@ class ExecutionService:
             yield "\n✅ Execution completed successfully.\n"
 
         except Exception as e:
-            await self.session_service.fail_session(session.id, str(e))
+            if session is not None:
+                await self.session_service.fail_session(session.id, str(e))
             yield f"\n❌ Execution failed: {e}\n"
