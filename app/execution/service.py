@@ -48,15 +48,22 @@ class ExecutionService:
     async def execute(
         self,
         prompt: str,
+        history: list[Message] | None = None,
         user_id: UUID | None = None,
     ) -> AsyncIterator[str]:
         """
         Execute a user prompt end-to-end.
 
         Orchestrates: requirement gathering → planning → execution → evaluation.
+
+        `history` is the conversation so far, so that a follow-up answer to a
+        clarifying question is resolved against the question that prompted it.
         """
         if user_id is None:
             user_id = uuid4()
+
+        if not history:
+            history = [Message(role=MessageRole.USER, content=prompt)]
 
         session = None
         try:
@@ -72,9 +79,7 @@ class ExecutionService:
             yield "📋 Gathering requirements...\n"
 
             try:
-                requirements_result = await self.requirement_agent.gather(
-                    [Message(role=MessageRole.USER, content=prompt)]
-                )
+                requirements_result = await self.requirement_agent.gather(history)
             except StructuredOutputError as e:
                 yield f"⚠️  Could not parse requirements from LLM. Raw output: {e.raw_output}\n"
                 yield "Proceeding with full prompt as requirements...\n"

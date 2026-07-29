@@ -110,8 +110,19 @@ class RuntimeService:
                 )
 
             case Intent.EXECUTE:
-                async for chunk in self.execution_service.execute(prompt):
+                reply = ""
+
+                async for chunk in self.execution_service.execute(prompt, history):
+                    reply += chunk
                     yield chunk
+
+                await self.message_service.create_message(
+                    messages_schemas.MessageCreate(
+                        conversation_id=self.active_conversation_id,
+                        content=reply,
+                        role=MessageRole.ASSISTANT,
+                    )
+                )
 
     async def _prepare_chat(
         self,

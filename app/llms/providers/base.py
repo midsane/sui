@@ -1,8 +1,9 @@
 import json
+import re
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
 from dataclasses import is_dataclass
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from pydantic import TypeAdapter
 
@@ -10,6 +11,43 @@ from app.entities.messages.models import Message
 from app.llms.schemas import ChatResult, StructuredOutputError
 
 T = TypeVar("T")
+
+_FENCE_RE = re.compile(
+    r"```(?:json|JSON)?\s*(?P<body>.*?)\s*```",
+    re.DOTALL,
+)
+
+
+def _decode_json(text: str) -> Any:
+    """
+    Parse JSON from raw LLM output.
+
+    Models frequently wrap JSON in markdown fences or surround it with prose
+    despite being told not to, so fall back to fence extraction and then to
+    the outermost brace/bracket span before giving up.
+    """
+    candidates = [text.strip()]
+
+    fence = _FENCE_RE.search(text)
+    if fence is not None:
+        candidates.append(fence.group("body").strip())
+
+    for opening, closing in (("{", "}"), ("[", "]")):
+        start = text.find(opening)
+        end = text.rfind(closing)
+        if start != -1 and end > start:
+            candidates.append(text[start : end + 1].strip())
+
+    last_error: json.JSONDecodeError | None = None
+    for candidate in candidates:
+        if not candidate:
+            continue
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError as e:
+            last_error = e
+
+    raise last_error or json.JSONDecodeError("No JSON found in output", text, 0)
 
 
 class BaseProvider(ABC):
@@ -42,7 +80,7 @@ class BaseProvider(ABC):
         result = await self.llm_call(messages)
 
         try:
-            parsed_json = json.loads(result.text)
+            parsed_json = _decode_json(result.text)
         except json.JSONDecodeError as e:
             raise StructuredOutputError(response_model, result.text, e) from e
 
