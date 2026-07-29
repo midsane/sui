@@ -7,6 +7,7 @@ from app.entities.execution_sessions.schemas import (
     ExecutionSessionUpdate,
 )
 from app.entities.execution_sessions.service import ExecutionSessionService
+from app.entities.messages.models import Message
 from app.execution.evaluation.evaluator import Evaluator
 from app.execution.executor.executor import Executor
 from app.execution.planning.planner import Planner
@@ -15,7 +16,7 @@ from app.execution.requirements.agent import RequirementAgent
 from app.execution.requirements.schemas import RequirementStatus
 from app.execution.tools.registry import ToolRegistry
 from app.llms.service import LLMService
-from app.types import ExecutionStatus
+from app.types import ExecutionStatus, MessageRole
 
 
 class ExecutionService:
@@ -69,7 +70,9 @@ class ExecutionService:
 
             yield "📋 Gathering requirements...\n"
 
-            requirements_result = await self.requirement_agent.gather([])
+            requirements_result = await self.requirement_agent.gather(
+                [Message(role=MessageRole.USER, content=prompt)]
+            )
             if requirements_result.status == RequirementStatus.NEEDS_INPUT:
                 yield f"❓ {requirements_result.question}\n"
                 return
